@@ -15,7 +15,7 @@ setInterval(async() => {
   const fakeData = generateFakeSensorData();
   await addSensorData(fakeData);
   console.log('📡 Automatisch simulierte Sensor-Daten:', fakeData);
-}, 5_000);
+}, 15_000);
 
 // Starten des Servers
 app.listen(port, () => {
