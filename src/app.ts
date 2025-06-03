@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import sensorRouter from './sensor';
 import { startSimulation } from './simulation';

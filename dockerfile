@@ -11,4 +11,4 @@ COPY . /app/
 RUN bun install
 
 # Start the Application
-CMD ["bun", "src/app.ts"]
+CMD ["bun", "run", "src/app.ts"]

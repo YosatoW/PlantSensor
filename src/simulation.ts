@@ -1,5 +1,5 @@
 import { db } from './database';
-import { sensor_data } from './db/schema';
+import { plantSensor } from './db/schema';
 
 type SensorEntry = {
   moisture: number;
@@ -17,10 +17,10 @@ export function generateFakeSensorData(): SensorEntry {
 }
 
 export async function addSensorData(eintrag: SensorEntry) {
-  await db.insert(sensor_data).values(eintrag);
+  await db.insert(plantSensor).values(eintrag);
 }
 
-export function startSimulation(intervalMs = 15000) {
+export async function startSimulation(intervalMs = 60_000) {
   setInterval(async () => {
     const data = generateFakeSensorData();
     await addSensorData(data);

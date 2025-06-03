@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express';
 import { db } from './database';
-import { sensor_data } from './db/schema';
+import { plantSensor } from './db/schema';
 import { eq } from 'drizzle-orm';
 
 const router = Router();
@@ -30,7 +30,7 @@ router.post('/data', async (req: Request, res: Response) => {
   };
 
   try {
-    await db.insert(sensor_data).values(eintrag);
+    await db.insert(plantSensor).values(eintrag);
     console.log(`🌱 ${timestamp.toLocaleString()} | ECHT | Feuchtigkeit: ${feuchtigkeit}%`);
     res.status(201).json({ message: 'Echter Feuchtigkeitswert gespeichert', eintrag });
   } catch (error) {
@@ -41,19 +41,19 @@ router.post('/data', async (req: Request, res: Response) => {
 
 // Alle Sensorwerte
 router.get('/', async (_req: Request, res: Response) => {
-  const data = await db.select().from(sensor_data);
+  const data = await db.select().from(plantSensor);
   res.json(data);
 });
 
 // Nur echte Daten
 router.get('/data/real', async (_req: Request, res: Response) => {
-  const data = await db.select().from(sensor_data).where(eq(sensor_data.simulated, false));
+  const data = await db.select().from(plantSensor).where(eq(plantSensor.simulated, false));
   res.json(data);
 });
 
 // Nur simulierte Daten
 router.get('/data/simulated', async (_req: Request, res: Response) => {
-  const data = await db.select().from(sensor_data).where(eq(sensor_data.simulated, true));
+  const data = await db.select().from(plantSensor).where(eq(plantSensor.simulated, true));
   res.json(data);
 });
 
