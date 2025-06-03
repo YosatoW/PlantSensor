@@ -1,102 +1,60 @@
 import { Router, type Request, type Response } from 'express';
 import { db } from './database';
 import { sensor_data } from './db/schema';
+import { eq } from 'drizzle-orm';
 
 const router = Router();
-
-const sensorData: SensorEntry[] = [];
 
 type SensorEntry = {
   moisture: number;
   temperature: number;
   timestamp: Date;
+  simulated: boolean;
 };
 
+// Neue echte Feuchtigkeitsdaten speichern
+router.post('/data', async (req: Request, res: Response) => {
+  const { feuchtigkeit } = req.body as { feuchtigkeit?: number };
 
+  if (typeof feuchtigkeit !== 'number') {
+    return res.status(400).json({ message: 'Ungültiger Wert. Es muss eine Zahl sein.' });
+  }
 
-
-
-
-
-// Funktion zum Hinzufügen von Sensordaten zur Datenbank
-export async function addSensorData(data: SensorEntry) {
-  await db.insert(sensor_data).values(data);
-}
-
-
-
-
-
-
-// Funktion zur Generierung von simulierten Sensordaten
-export function generateFakeSensorData(): SensorEntry {
-  const moisture = Math.floor(Math.random() * 101); // 0–100 %
-  const temperature = +(15 + Math.random() * 30).toFixed(2); // 15–45 °C
   const timestamp = new Date();
-  return { moisture, temperature, timestamp };
-}
 
+  const eintrag: SensorEntry = {
+    moisture: feuchtigkeit,
+    temperature: -1, // Dummywert
+    timestamp,
+    simulated: false
+  };
 
+  try {
+    await db.insert(sensor_data).values(eintrag);
+    console.log(`🌱 ${timestamp.toLocaleString()} | ECHT | Feuchtigkeit: ${feuchtigkeit}%`);
+    res.status(201).json({ message: 'Echter Feuchtigkeitswert gespeichert', eintrag });
+  } catch (error) {
+    console.error('❌ Fehler beim Speichern:', error);
+    res.status(500).json({ message: 'Fehler beim Speichern' });
+  }
+});
 
-// Route für den Zugriff auf Sensordaten
-router.get('/', async  (req: Request, res: Response) =>{
+// Alle Sensorwerte
+router.get('/', async (_req: Request, res: Response) => {
   const data = await db.select().from(sensor_data);
   res.json(data);
 });
 
-
-
-
-
-// Route für den Zugriff auf die Durchschnittswerte
-router.get('/average', (_req: Request, res: Response) => {
-  if (sensorData.length === 0) {
-    return res.status(404).json({ message: 'Keine Daten verfügbar' });
-  }
-
-  const avgMoisture =
-    sensorData.reduce((sum, entry) => sum + entry.moisture, 0) / sensorData.length;
-  const avgTemp =
-    sensorData.reduce((sum, entry) => sum + entry.temperature, 0) / sensorData.length;
-
-  res.json({
-    averageMoisture: +avgMoisture.toFixed(2),
-    averageTemperature: +avgTemp.toFixed(2),
-    count: sensorData.length
-  });
+// Nur echte Daten
+router.get('/data/real', async (_req: Request, res: Response) => {
+  const data = await db.select().from(sensor_data).where(eq(sensor_data.simulated, false));
+  res.json(data);
 });
 
-
-
-
-
-
-
-
-// Route für das Speichern von simulierten Sensordaten
-router.post('/', async (_req: Request, res: Response) => {
-  const data = generateFakeSensorData();
-  await sensorData.push(data);
-
-  res.status(201).json({
-    message: 'Simulierter Sensorwert gespeichert',
-    data
-  });
-});
-
-
-
-
-
-
-
-
-
-
-// Route für das Löschen aller Sensorwerte
-router.delete('/', (_req: Request, res: Response) => {
-  sensorData.length = 0;
-  res.json({ message: 'Alle Sensorwerte gelöscht' });
+// Nur simulierte Daten
+router.get('/data/simulated', async (_req: Request, res: Response) => {
+  const data = await db.select().from(sensor_data).where(eq(sensor_data.simulated, true));
+  res.json(data);
 });
 
 export default router;
