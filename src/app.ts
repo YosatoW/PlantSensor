@@ -2,16 +2,18 @@ import 'dotenv/config';
 import express from 'express';
 import sensorRouter from './sensor';
 import { startSimulation } from './simulation';
+import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://plant-sensor-frontend.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
+const allowedOrigin = 'https://plant-sensor-frontend-git-main-chvvnrs-projects.vercel.app';
+
+app.use(cors({
+  origin: allowedOrigin,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 
 
 app.use(express.json());
