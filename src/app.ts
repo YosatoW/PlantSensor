@@ -9,7 +9,8 @@ const port = process.env.PORT || 3000;
 
 const allowedOrigins = [
   'https://plant-sensor-frontend-5nuprlk0z-chvvns-projects.vercel.app',
-  'https://plant-sensor-frontend-git-main-chvvns-projects.vercel.app'
+  'https://plant-sensor-frontend-git-main-chvvns-projects.vercel.app',
+  'https://plant-sensor-frontend.vercel.app'
 ];
 
 app.use(cors({
