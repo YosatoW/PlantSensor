@@ -14,6 +14,10 @@ if (process.env.SIMULATION === 'true') {
   startSimulation();
 }
 
+app.get('/', (req, res) => {
+  res.send('plant_sensor API läuft!');
+});
+
 app.listen(port, () => {
   console.log(`✅ Server läuft auf http://localhost:${port}`);
 });

@@ -1,14 +1,18 @@
-# base Image with Bun pre-installed
+# Base Image mit Bun
 FROM oven/bun:latest
 
-# Set the working directory
+# Arbeitsverzeichnis setzen
 WORKDIR /app
 
-# Copy the Cource Code
-COPY . /app/
+# Source Code kopieren
+COPY . .
 
-# Install the dependencies
+# Abhängigkeiten installieren
 RUN bun install
 
-# Start the Application
+# Port für Azure App Service freigeben (sehr wichtig!)
+ENV PORT=3000
+EXPOSE 3000
+
+# Anwendung starten
 CMD ["bun", "run", "src/app.ts"]

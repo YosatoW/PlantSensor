@@ -6,38 +6,40 @@ import { eq } from 'drizzle-orm';
 const router = Router();
 
 type SensorEntry = {
-  moisture: number;
-  temperature: number;
+  feuchtigkeit: number;   // <- neu
   timestamp: Date;
   simulated: boolean;
 };
 
 // Neue echte Feuchtigkeitsdaten speichern
-router.post('/data', async (req: Request, res: Response) => {
-  const { feuchtigkeit } = req.body as { feuchtigkeit?: number };
+router.post(
+  '/data',
+  async function (req: Request, res: Response): Promise<void> {
+    const { feuchtigkeit } = req.body as { feuchtigkeit?: number };
 
-  if (typeof feuchtigkeit !== 'number') {
-    return res.status(400).json({ message: 'Ungültiger Wert. Es muss eine Zahl sein.' });
+    if (typeof feuchtigkeit !== 'number') {
+      res.status(400).json({ message: 'Ungültiger Wert. Es muss eine Zahl sein.' });
+      return;
+    }
+
+    const timestamp = new Date();
+
+    const eintrag: SensorEntry = {
+      feuchtigkeit,
+      timestamp,
+      simulated: false,
+    };
+
+    try {
+      await db.insert(plantSensor).values(eintrag);
+      console.log(`🌱 ${timestamp.toLocaleString()} | ECHT | Feuchtigkeit: ${feuchtigkeit}`);
+      res.status(201).json({ message: 'Echter Feuchtigkeitswert gespeichert', eintrag });
+    } catch (error) {
+      console.error('❌ Fehler beim Speichern:', error);
+      res.status(500).json({ message: 'Fehler beim Speichern' });
+    }
   }
-
-  const timestamp = new Date();
-
-  const eintrag: SensorEntry = {
-    moisture: feuchtigkeit,
-    temperature: -1, // Dummywert
-    timestamp,
-    simulated: false
-  };
-
-  try {
-    await db.insert(plantSensor).values(eintrag);
-    console.log(`🌱 ${timestamp.toLocaleString()} | ECHT | Feuchtigkeit: ${feuchtigkeit}%`);
-    res.status(201).json({ message: 'Echter Feuchtigkeitswert gespeichert', eintrag });
-  } catch (error) {
-    console.error('❌ Fehler beim Speichern:', error);
-    res.status(500).json({ message: 'Fehler beim Speichern' });
-  }
-});
+);
 
 // Alle Sensorwerte
 router.get('/', async (_req: Request, res: Response) => {
