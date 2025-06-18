@@ -7,7 +7,7 @@ import cors from 'cors';
 const app = express();
 const port = process.env.PORT || 3000;
 
-const allowedOrigin = 'http://plant-sensor-app-chvvn17.azurewebsites.net/sensor/data';
+const allowedOrigin = 'https://plant-sensor-frontend-git-main-chvvns-projects.vercel.app';
 
 app.use(cors({
   origin: allowedOrigin,
