@@ -7,10 +7,19 @@ import cors from 'cors';
 const app = express();
 const port = process.env.PORT || 3000;
 
-const allowedOrigin = 'https://plant-sensor-frontend-git-main-chvvns-projects.vercel.app';
+const allowedOrigins = [
+  'https://plant-sensor-frontend-5nuprlk0z-chvvns-projects.vercel.app',
+  'https://plant-sensor-frontend-git-main-chvvns-projects.vercel.app'
+];
 
 app.use(cors({
-  origin: allowedOrigin,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Nicht erlaubter Origin: ' + origin));
+    }
+  },
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
