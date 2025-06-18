@@ -2,9 +2,18 @@ import 'dotenv/config';
 import express from 'express';
 import sensorRouter from './sensor';
 import { startSimulation } from './simulation';
+import cors from 'cors'; 
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(
+  cors({
+    origin: "https://plant-sensor-frontend.vercel.app",
+    methods: ["GET", "POST"],
+  })
+);
+
 
 app.use(express.json());
 app.use('/sensor', sensorRouter);
