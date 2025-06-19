@@ -8,21 +8,21 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const allowedOrigins = [
-  'https://plant-sensor-frontend-5nuprlk0z-chvvns-projects.vercel.app',
-  'https://plant-sensor-frontend-git-main-chvvns-projects.vercel.app',
-  'https://plant-sensor-frontend.vercel.app'
+  'https://plant-sensor-frontend.vercel.app',
+  'https://plant-sensor-frontend-git-main-chvwns-projects.vercel.app',
+  'https://plant-sensor-frontend-5nuprk0z-chvwns-projects.vercel.app'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
       callback(null, true);
     } else {
-      callback(new Error('Nicht erlaubter Origin: ' + origin));
+      callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
+  allowedHeaders: ['Content-Type'],
 }));
 
 
